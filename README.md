@@ -184,3 +184,43 @@ MIT — see [LICENSE](LICENSE)
 ---
 
 *Built by [CJ Wang](https://sowork.ai) · Founder @ SoWork.ai · AI × Marketing × Open Source*
+
+
+## Market-Agnostic Design
+
+Unlike traditional marketing workspaces, openclaw-workspace-sowork is **completely market-independent**:
+
+- ✅ **No market hardcoding** — Same workspace for 13+ markets, 6 languages, any industry
+- - ✅ **Pluggable learning layers** — Enterprise learnings shared across all markets
+  - - ✅ **Scalable architecture** — Add markets without duplicating agents or infrastructure
+    - - ✅ **Zero market lock-in** — SOUL.md, AGENTS.md, TOOLS.md work globally
+     
+      - See [docs/LEARN.md](docs/LEARN.md) for five-layer learning architecture supporting any market, department, or team.
+     
+      - ## Five-Layer Learning System
+     
+      - This workspace implements **Hermes-inspired five-layer learning** for systematic knowledge building:
+     
+      - ```
+        Enterprise → Brand → Department → Team → Personal
+        (public)  (internal) (team-only) (private) (local)
+        ```
+
+        Each layer has separate access controls and security gates:
+        - **Enterprise**: Organization-wide patterns (public)
+        - - **Brand**: Brand identity & positioning (internal)
+          - - **Department**: Department-specific strategies (team-only)
+            - - **Team**: Direct team learnings (private)
+              - - **Personal**: Individual agent learnings (never committed)
+               
+                - **See [docs/LEARN.md](docs/LEARN.md) for complete architecture and implementation.**
+               
+                - ## Security & Compliance
+               
+                - - 📋 **SECURITY.md** — Vulnerability disclosure, data isolation, five-layer security model
+                  - - 🔐 **MEMORY.md** — Security-gated context, never leaks to group chats
+                    - - 🛡️ **Enhanced .gitignore** — Blocks personal learnings, agent conversations, credentials
+                      - - ✅ **Zero dependencies** — Pure configuration, no supply chain risk
+                        - - 🌍 **GDPR/SOC2 ready** — Separate data layers prevent PII leakage
+                         
+                          - **See [SECURITY.md](SECURITY.md) for full security policy.**
