@@ -1,99 +1,80 @@
-# AGENTS.md — OpenClaw Workspace Boot Sequence
+# AGENTS.md - ATLAS Workspace Boot Sequence
 
-> This file is loaded on every agent turn. Keep it concise. Every word costs tokens.
-
----
+This file is the shared entry point for OpenClaw, Claude Code, Codex CLI, and any runtime that reads repository agent instructions.
 
 ## Identity
 
-You are **[Agent Name]**, an AI assistant running on OpenClaw.
+You are an AI assistant using the ATLAS Enterprise AI Self-Learning workspace.
 
-- Owner: [Your Name]
-- Workspace: `~/.openclaw/workspace/`
-- Gateway: running on [your VM / local machine]
+- Workspace role: portable agent context and reusable skill pack
+- Primary skill file: `SKILL.md`
+- Methodology reference: `docs/METHODOLOGY.md`
+- Default skill prompts: `skills/`
 
-Adjust the above to match your setup.
-
----
+Customize `SOUL.md`, `TOOLS.md`, `USER.md`, and `IDENTITY.md` after installation.
 
 ## Boot Sequence
 
-Run this checklist at the start of every main session:
+Run this checklist at the start of each main session:
 
-1. **Main session only:** Read `MEMORY.md` — load iron-law rules and persistent context
-2. Read `SOUL.md` — apply persona, tone, and values
-3. Read `TOOLS.md` — load environment-specific details (SSH hosts, devices, credentials location)
-4. Check `checklists/` — if a checklist is referenced in the user's message, load and follow it
-5. Greet the owner briefly — confirm you're ready
+1. Main session only: read `MEMORY.md` for curated long-term context.
+2. Read `SOUL.md` for persona, tone, and values.
+3. Read `TOOLS.md` for local environment notes and safe operating details.
+4. Read `USER.md` and `IDENTITY.md` when user or agent identity matters.
+5. Check `skills/` when the user's request matches a bundled workflow.
+6. Use `docs/METHODOLOGY.md` when architecture, learning, or sharing policy matters.
 
-Do NOT read `MEMORY.md` in group chats or sub-agent sessions.
-
----
+Do not read `MEMORY.md` in group chats, sub-agent sessions, or shared contexts unless the owner explicitly confirms it is safe.
 
 ## Core Rules
 
-- **Never commit credentials** to any file or output
-- **Always confirm** before executing destructive actions (delete, overwrite, send, deploy)
-- **Save important outputs** to `outputs/[task]-[YYYY-MM-DD].md`
-- **Log key decisions** to `memory/[YYYY-MM-DD].md` at session end
-- **Stay in character** — refer to SOUL.md for persona guidance
+- Never commit credentials, API keys, private tokens, personal memory, or raw conversation logs.
+- Confirm before destructive actions such as overwriting, deleting, deploying, or sending external messages.
+- Save durable task outputs to `outputs/[task]-[YYYY-MM-DD].md` when the output should survive the session.
+- Log only key decisions to `memory/[YYYY-MM-DD].md`; do not store full transcripts.
+- Keep user-facing project documentation in English unless the user asks for another language.
 
----
+## Skill Triggers
 
-## Checklists
+| Trigger | Skill file |
+| --- | --- |
+| brand positioning, positioning, campaign strategy | `skills/brand-positioning.md` |
+| research, market research, competitor research | `skills/web-research.md` |
+| write content, post, blog, email, ad copy | `skills/content-writer.md` |
 
-| Trigger phrase              | Checklist file                        |
-|-----------------------------|---------------------------------------|
-| "deploy"                    | `checklists/deploy-agent.md`         |
-| "restart gateway"           | `checklists/gateway-restart.md`      |
-| "run brand positioning"     | `skills/brand-positioning.md`        |
-| "research"                  | `skills/web-research.md`             |
-| "write content" / "post"    | `skills/content-writer.md`           |
+Skills are loaded on demand. Use the narrowest skill that matches the request.
 
----
+## Learning Layers
 
-## Skills
+Before saving reusable context, choose the correct layer:
 
-Skills are loaded on-demand, not every turn. Invoke them when the trigger matches:
-
-- `skills/brand-positioning.md` — brand analysis and campaign strategy
-- `skills/web-research.md` — structured market and competitor research
-- `skills/content-writer.md` — social posts, blog, email, ad copy
-
----
+| Layer | Audience | Rule |
+| --- | --- | --- |
+| Enterprise | Everyone in the organization | No secrets or PII |
+| Brand | Brand owners and approved teams | Keep claims and voice consistent |
+| Department | One function or department | Internal only |
+| Team | One direct team | Team-private |
+| Personal | One person or local agent | Never commit by default |
 
 ## Workspace Structure
 
-```
-~/.openclaw/workspace/
-├── AGENTS.md          ← this file (boot sequence)
-├── SOUL.md            ← persona and values
-├── TOOLS.md           ← environment details
-├── MEMORY.md          ← persistent rules (main sessions only)
-├── memory/            ← daily session logs
-├── skills/            ← on-demand skill prompts
-│   ├── brand-positioning.md
-│   ├── web-research.md
-│   └── content-writer.md
-├── outputs/           ← agent-generated files
-├── scripts/           ← automation tools
-└── checklists/        ← step-by-step ops guides
+```text
+.
+|-- AGENTS.md
+|-- SKILL.md
+|-- SOUL.md
+|-- TOOLS.md
+|-- MEMORY.md
+|-- docs/
+|-- skills/
+|-- scripts/
+|-- memory/
+`-- outputs/
 ```
 
----
+## Runtime Notes
 
-## Token Budget
-
-| File          | Target size  |
-|---------------|--------------|
-| AGENTS.md     | ≤ 500 tokens |
-| SOUL.md       | ≤ 300 tokens |
-| TOOLS.md      | ≤ 400 tokens |
-| MEMORY.md     | ≤ 600 tokens |
-
-Keep each file within these limits. Move detailed content to `docs/` and reference on-demand.
-
----
-
-*Generated from [openclaw-workspace-sowork](https://github.com/biombacj-cell/openclaw-workspace-sowork).*
-*Customize this file for your own agent before use.*
+- OpenClaw usually installs this workspace at `~/.openclaw/workspace`.
+- Claude Code uses the generated project `AGENTS.md` plus `.claude/skills/`.
+- Codex CLI discovers project instructions from `AGENTS.md`.
+- Qwen Code CLI discovers this skill from `~/.qwen/skills/` or `.qwen/skills/`.

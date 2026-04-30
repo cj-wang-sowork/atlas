@@ -1,114 +1,100 @@
 ---
-name: openclaw-workspace-sowork
+name: atlas-enterprise-ai-self-learning
 description: >
-  Production-ready workspace template for Claude Code, OpenClaw, and Hermes.
-  Includes brand positioning, web research, and content writing skills,
-  plus a full AGENTS/SOUL/TOOLS/USER/IDENTITY/HEARTBEAT/MEMORY workspace system.
-  Battle-tested across 13 markets by SoWork. DeepEval score: 0.940.
-version: "1.1.0"
+  Portable enterprise agent workspace and skill pack for OpenClaw, Claude Code,
+  Codex CLI, and Qwen Code CLI. Provides reusable brand, research, and content
+  workflows plus a five-layer methodology for safe self-learning across
+  enterprise, brand, department, team, and personal context.
+version: "1.2.0"
 author: cj-wang-sowork
 license: MIT
 tags:
-  - marketing
   - openclaw
-  - workspace
-  - agent-template
-  - brand-positioning
-  - content-writing
-  - web-research
-  - memory
-  - multi-agent
+  - claude-code
+  - codex-cli
+  - qwen-code
+  - agent-workspace
+  - skills
+  - self-learning
+  - enterprise-ai
+  - knowledge-management
+  - security
 requirements:
-  - Claude Code, OpenClaw, or Hermes
-  - A Linux/macOS machine or VM
+  - OpenClaw, Claude Code, Codex CLI, or Qwen Code CLI
+  - macOS, Linux, or WSL
+  - Python 3 for optional learning modules and installer path normalization
 ---
 
-# openclaw-workspace-sowork
+# ATLAS Enterprise AI Self-Learning
 
-A production-ready workspace template for Claude Code, OpenClaw, and Hermes — clone it, fill in your brand context, and run.
+Use this skill when a user wants an agent workspace that can be installed across OpenClaw, Claude Code, Codex CLI, and Qwen Code CLI, or when they need repeatable brand, research, content, and learning workflows.
 
-## What This Skill Does
+## What This Skill Provides
 
-When you install this workspace, your OpenClaw agent gains:
+1. A portable workspace bundle with `AGENTS.md`, `SOUL.md`, `TOOLS.md`, `MEMORY.md`, and operational templates.
+2. Three bundled workflow prompts:
+   - `skills/brand-positioning.md`
+   - `skills/web-research.md`
+   - `skills/content-writer.md`
+3. A five-layer learning methodology:
+   - Enterprise
+   - Brand
+   - Department
+   - Team
+   - Personal
+4. Optional Python modules for learning, market routing, security checks, pattern adaptation, and market intelligence.
 
-1. **Brand Positioning** — Analyze brand USPs, map competitors, generate campaign strategy.
-2. **Web Research** — Structured market research and trend monitoring across any market.
-3. **Content Writing** — Brand-aligned content (social, blog, campaigns) for any platform.
+## When To Activate
 
-Beyond skills, you get a **complete workspace file system** plus a quick installer for three runtimes:
+Activate this skill when the user asks to:
 
-| Runtime | Install path |
-|---------|--------------|
-| Claude Code | project root with `AGENTS.md` launcher + `./.sowork-workspace/` via `./scripts/install-workspace.sh --target claude --dest ...` |
-| OpenClaw | `~/.openclaw/workspace` |
-| Hermes | `~/.hermes/skills/openclaw-imports/openclaw-workspace-sowork` |
+- Set up or migrate an agent workspace
+- Install the workspace for OpenClaw, Claude Code, Codex CLI, or Qwen Code CLI
+- Build reusable team skills or prompts
+- Create brand positioning, market research, or content outputs
+- Explain or apply the ATLAS five-layer learning methodology
+- Audit whether agent memory or learning files are safe to share
 
-The Claude installer refuses to overwrite an existing `AGENTS.md` unless you pass `--force`.
+## Workflow
 
-| File | Purpose |
-|------|---------|
-| AGENTS.md | Boot sequence, routing rules, checklist table |
-| SOUL.md | Persona, tone, brand-in-SOUL methodology |
-| TOOLS.md | Environment: SSH hosts, API config, TTS voices |
-| USER.md | Team context, preferences (main sessions only) |
-| IDENTITY.md | Name, emoji, avatar |
-| HEARTBEAT.md | Periodic health tasks and content pipeline checks |
-| MEMORY.md | Long-term memory template for persistent context (security-gated) |
+1. Identify the target runtime:
+   - OpenClaw uses `~/.openclaw/workspace`.
+   - Claude Code uses a project `AGENTS.md` launcher and `.claude/skills/`.
+   - Codex CLI uses project `AGENTS.md` instruction discovery.
+   - Qwen Code CLI uses `~/.qwen/skills/` or `.qwen/skills/` skill directories.
+2. Read the local workspace files before changing behavior:
+   - `AGENTS.md`
+   - `SOUL.md`
+   - `TOOLS.md`
+   - `MEMORY.md` only for direct owner sessions
+3. Select the most relevant bundled skill from `skills/`.
+4. Apply the five-layer learning rules:
+   - Share enterprise, brand, department, and team knowledge only at the intended audience level.
+   - Keep personal notes private and out of git.
+   - Never expose credentials, tokens, or private memory in outputs.
+5. Produce clear output and, when appropriate, write durable artifacts into `outputs/`.
 
-## Installation
+## Installation Commands
 
 ```bash
-# Clone the repo
-git clone https://github.com/cj-wang-sowork/openclaw-workspace-sowork.git
-cd openclaw-workspace-sowork
-
-# Install into OpenClaw
 ./scripts/install-workspace.sh --target openclaw
-
-# Install into Claude Code (project-local)
 ./scripts/install-workspace.sh --target claude --dest ~/workspace/your-project
-
-# Install into Hermes
-./scripts/install-workspace.sh --target hermes
+./scripts/install-workspace.sh --target codex --dest ~/workspace/your-project
+./scripts/install-workspace.sh --target qwen
+./scripts/install-workspace.sh --target all --dest ~/workspace/your-project
 ```
 
-For `--target all`, `--dest` applies to the Claude Code project only. OpenClaw and Hermes keep their default install paths.
+## Expected Behavior
 
-If you still prefer the Skills CLI path for OpenClaw only:
+- Prefer simple, explicit instructions over hidden automation.
+- Keep all user-facing documentation in English unless the user asks otherwise.
+- Ask before destructive operations such as overwriting an existing project `AGENTS.md`.
+- Treat `MEMORY.md`, `memory/`, and personal learning files as sensitive.
+- Summarize architectural decisions in a way that future agents can reuse.
 
-```bash
-npx skills add cj-wang-sowork/openclaw-workspace-sowork
-```
+## References
 
-## Quick Usage
-
-After installation, trigger skills with:
-
-```
-@assistant Run brand positioning for [Your Brand]
-@assistant Research [topic or market]
-@assistant Write [content type] for [platform]
-```
-
-## Production Validation
-
-Extracted from real SoWork operations:
-- **13 markets** on 1 VM simultaneously
-- **~$50/month** total infrastructure cost
-- **3 agents** running in parallel (brand, research, content)
-- **DeepEval score: 0.940** on brand consistency
-- **Token efficiency**: Full bootstrap under 150k chars
-
-## Multi-Agent Example
-
-See `examples/marketing-team/` for a complete 3-agent setup with cost breakdown.
-
-## Security
-
-MEMORY.md is security-gated — loaded in main sessions only, never in group chats or sub-agents.
-
-## Related
-
-- [SoWork.ai](https://sowork.ai) — AI marketing platform this workspace powers
-- [VoltAgent/awesome-openclaw-skills](https://github.com/VoltAgent/awesome-openclaw-skills) — skills registry
-- [win4r/openclaw-workspace](https://github.com/win4r/openclaw-workspace) — workspace maintenance skill
+- `README.md` for the short install guide.
+- `docs/INSTALLATION.md` for runtime-specific installation details.
+- `docs/METHODOLOGY.md` for the architecture and rationale.
+- `docs/LEARN.md` for the five-layer learning reference.

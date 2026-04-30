@@ -12,18 +12,22 @@ usage() {
 Usage:
   ./scripts/install-workspace.sh --target openclaw [--dest PATH] [--force]
   ./scripts/install-workspace.sh --target claude --dest PATH [--force]
+  ./scripts/install-workspace.sh --target codex --dest PATH [--force]
+  ./scripts/install-workspace.sh --target qwen [--dest PATH] [--force]
   ./scripts/install-workspace.sh --target hermes [--dest PATH] [--force]
   ./scripts/install-workspace.sh --target all --dest PATH [--force]
 
 Targets:
   openclaw  Install the workspace files into ~/.openclaw/workspace by default
-  claude    Install an AGENTS.md launcher plus .sowork-workspace/ into a Claude Code project root (requires --dest)
+  claude    Install an AGENTS.md launcher, .atlas-workspace/, and .claude/skills/ into a Claude Code project root (requires --dest)
+  codex     Install an AGENTS.md launcher plus .atlas-workspace/ into a Codex CLI project root (requires --dest)
+  qwen      Install a Qwen skill pack into ~/.qwen/skills/atlas-enterprise-ai-self-learning by default
   hermes    Install a Hermes skill pack into ~/.hermes/skills/openclaw-imports/openclaw-workspace-sowork by default
-  all       Install claude + openclaw + hermes (requires --dest for the Claude target)
+  all       Install openclaw + claude + codex + qwen + hermes (requires --dest for Claude/Codex)
 
 Options:
-  --target TARGET   One of: openclaw, claude, hermes, all
-  --dest PATH       Destination path (required for claude, optional otherwise)
+  --target TARGET   One of: openclaw, claude, codex, qwen, hermes, all
+  --dest PATH       Destination path (required for claude/codex, optional otherwise)
   --force           Overwrite existing files instead of creating timestamped backups
   -h, --help        Show this help message
 EOF
@@ -110,26 +114,53 @@ copy_workspace_bundle() {
   done
 }
 
-write_claude_launcher() {
+copy_skill_pack() {
+  skill_dest=$1
+  mkdir -p "$skill_dest/references" "$skill_dest/templates/workspace" "$skill_dest/assets"
+
+  backup_or_remove "$skill_dest/SKILL.md"
+  cp "$REPO_ROOT/SKILL.md" "$skill_dest/SKILL.md"
+
+  for item in AGENTS.md HEARTBEAT.md IDENTITY.md MEMORY.md SOUL.md TOOLS.md USER.md; do
+    backup_or_remove "$skill_dest/templates/workspace/$item"
+    cp "$REPO_ROOT/$item" "$skill_dest/templates/workspace/$item"
+  done
+
+  for item in README.md docs/INSTALLATION.md docs/METHODOLOGY.md docs/LEARN.md docs/workspace-deep-dive.md; do
+    src="$REPO_ROOT/$item"
+    [ -e "$src" ] || continue
+    dest_name=$(basename "$item")
+    backup_or_remove "$skill_dest/references/$dest_name"
+    cp "$src" "$skill_dest/references/$dest_name"
+  done
+
+  backup_or_remove "$skill_dest/assets/skills"
+  cp -R "$REPO_ROOT/skills" "$skill_dest/assets/skills"
+}
+
+write_project_launcher() {
   launcher_root=$1
+  runtime_name=$2
   launcher_path="$launcher_root/AGENTS.md"
   backup_or_remove "$launcher_path"
   cat > "$launcher_path" <<'EOF'
-# AGENTS.md — Claude Code bootstrap for openclaw-workspace-sowork
+# AGENTS.md - ATLAS bootstrap
 
 At the start of each session, load and follow these workspace files:
 
-- `./.sowork-workspace/AGENTS.md`
-- `./.sowork-workspace/SOUL.md`
-- `./.sowork-workspace/TOOLS.md`
-- `./.sowork-workspace/USER.md`
-- `./.sowork-workspace/IDENTITY.md`
-- `./.sowork-workspace/HEARTBEAT.md`
-- `./.sowork-workspace/MEMORY.md` for direct owner sessions only
+- `./.atlas-workspace/AGENTS.md`
+- `./.atlas-workspace/SOUL.md`
+- `./.atlas-workspace/TOOLS.md`
+- `./.atlas-workspace/USER.md`
+- `./.atlas-workspace/IDENTITY.md`
+- `./.atlas-workspace/HEARTBEAT.md`
+- `./.atlas-workspace/MEMORY.md` for direct owner sessions only
 
-Use the reusable skill prompts from `./.sowork-workspace/skills/` when the task matches.
-Treat `./.sowork-workspace/` as agent context, not application source code, unless the user explicitly asks you to edit it.
+Use the reusable skill prompts from `./.atlas-workspace/skills/` when the task matches.
+Read `./.atlas-workspace/docs/METHODOLOGY.md` when architecture or learning policy matters.
+Treat `./.atlas-workspace/` as agent context, not application source code, unless the user explicitly asks you to edit it.
 EOF
+  log "$runtime_name launcher written -> $launcher_path"
 }
 
 install_openclaw() {
@@ -150,37 +181,44 @@ install_claude() {
     fail "Refusing to overwrite $project_root/AGENTS.md. Move it, merge it manually, or rerun with --force."
   fi
 
-  claude_workspace="$project_root/.sowork-workspace"
+  claude_workspace="$project_root/.atlas-workspace"
   log "Installing Claude Code workspace context -> $claude_workspace"
   copy_workspace_bundle "$claude_workspace"
-  write_claude_launcher "$project_root"
-  log "Claude install complete. Claude Code will pick up AGENTS.md and load ./.sowork-workspace/."
+  copy_skill_pack "$project_root/.claude/skills/atlas-enterprise-ai-self-learning"
+  write_project_launcher "$project_root" "Claude Code"
+  log "Claude install complete. Claude Code will pick up AGENTS.md, ./.atlas-workspace/, and ./.claude/skills/."
+}
+
+install_codex() {
+  project_root=$1
+  [ -n "$project_root" ] || fail "Codex target requires --dest /path/to/project"
+  ensure_safe_destination "$project_root"
+  mkdir -p "$project_root"
+
+  if [ -e "$project_root/AGENTS.md" ] && [ "$FORCE" -ne 1 ]; then
+    fail "Refusing to overwrite $project_root/AGENTS.md. Move it, merge it manually, or rerun with --force."
+  fi
+
+  codex_workspace="$project_root/.atlas-workspace"
+  log "Installing Codex CLI workspace context -> $codex_workspace"
+  copy_workspace_bundle "$codex_workspace"
+  write_project_launcher "$project_root" "Codex CLI"
+  log "Codex install complete. Start Codex from $project_root so it discovers AGENTS.md."
+}
+
+install_qwen() {
+  qwen_dest=${1:-"$HOME/.qwen/skills/atlas-enterprise-ai-self-learning"}
+  ensure_safe_destination "$qwen_dest"
+  log "Installing Qwen skill pack -> $qwen_dest"
+  copy_skill_pack "$qwen_dest"
+  log "Qwen install complete. Run qwen --list-skills to verify discovery."
 }
 
 install_hermes() {
   hermes_dest=${1:-"$HOME/.hermes/skills/openclaw-imports/openclaw-workspace-sowork"}
   ensure_safe_destination "$hermes_dest"
   log "Installing Hermes skill pack -> $hermes_dest"
-  mkdir -p "$hermes_dest"
-
-  backup_or_remove "$hermes_dest/SKILL.md"
-  mkdir -p "$hermes_dest/templates/workspace" "$hermes_dest/references" "$hermes_dest/assets"
-  cp "$REPO_ROOT/SKILL.md" "$hermes_dest/SKILL.md"
-
-  for item in AGENTS.md HEARTBEAT.md IDENTITY.md MEMORY.md SOUL.md TOOLS.md USER.md; do
-    backup_or_remove "$hermes_dest/templates/workspace/$item"
-    cp "$REPO_ROOT/$item" "$hermes_dest/templates/workspace/$item"
-  done
-
-  backup_or_remove "$hermes_dest/references/README.md"
-  cp "$REPO_ROOT/README.md" "$hermes_dest/references/README.md"
-
-  backup_or_remove "$hermes_dest/references/workspace-deep-dive.md"
-  cp "$REPO_ROOT/docs/workspace-deep-dive.md" "$hermes_dest/references/workspace-deep-dive.md"
-
-  backup_or_remove "$hermes_dest/assets/skills"
-  cp -R "$REPO_ROOT/skills" "$hermes_dest/assets/skills"
-
+  copy_skill_pack "$hermes_dest"
   log "Hermes install complete. Load the skill: openclaw-workspace-sowork"
 }
 
@@ -224,13 +262,21 @@ case "$TARGET" in
   claude)
     install_claude "$DEST"
     ;;
+  codex)
+    install_codex "$DEST"
+    ;;
+  qwen)
+    install_qwen "$DEST"
+    ;;
   hermes)
     install_hermes "$DEST"
     ;;
   all)
-    [ -n "$DEST" ] || fail "--target all requires --dest for the Claude project"
+    [ -n "$DEST" ] || fail "--target all requires --dest for the Claude/Codex project"
     install_openclaw
     install_claude "$DEST"
+    log "Codex CLI support enabled through $DEST/AGENTS.md and $DEST/.atlas-workspace."
+    install_qwen
     install_hermes
     ;;
   *)
